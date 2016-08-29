@@ -189,12 +189,12 @@ class bugDM():
                group by who order by nr DESC"
         user_status_list = self.fetch_data(sql)
 
-        print "The most active user is ", user_status_list[0][0]
+        print "The most active user is: ", user_status_list[0][0]
 
         sql = "select AVG(count) from (select who, count(who) as count \
                from bugs_activity group by who) q1"
         ave = self.fetch_data(sql)[0][0]
-        print "The average activity of users is ", ave
+        print "The average number of activities of all users is ", ave
 
         sql = "select count(who) from (select who, count(who) as count \
                from bugs_activity group by who) q1 where count>100"
@@ -231,7 +231,7 @@ def main(argv):
         print "Totally %d users, %d projects and %d bugs" % bugdm.get_summary()
         print "=================================================================\n\n"
 
-        num = 5
+        num = 10
         print "             Top %d bug hunters           | num of submitted bugs" % num
         print "================================================================="
         top_hunters = bugdm.get_bug_hunter()
@@ -239,7 +239,7 @@ def main(argv):
             print "%40s | %d" %(item[0], item[1])
         print "=================================================================\n\n"
 
-        print "             Top %d bug killers           | num of submitted bugs" % num
+        print "             Top %d bug killers           | num of resolved bugs" % num
         print "================================================================="
         top_hunters = bugdm.get_bug_killer()
         for item in top_hunters:
