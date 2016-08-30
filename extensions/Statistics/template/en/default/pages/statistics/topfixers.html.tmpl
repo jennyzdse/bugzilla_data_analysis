@@ -1,0 +1,42 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # users: list of hashes. May be empty. Each hash has two members:
+  #   login_name: string. The login name of the user
+  #   nr: integer. The number of bugs fixed by the users
+  #%]
+
+
+[% PROCESS global/header.html.tmpl
+           title = "Top Fixers"
+ %]
+
+[% total = 0 %]
+<table id="topfixers">
+  <tr>
+    <th>Who</th>
+    <th>Number of fixed bugs</th>
+  </tr>
+
+  [% FOREACH user = users %]
+    [% total = total + user.nr %]
+    <tr>
+      <td>
+          <a href="page.cgi?id=user.html&amp;user_id= [%- user.id FILTER uri %]"> [% user.login_name FILTER email FILTER html %] </a>
+      </td>
+      <td class="right">
+        [% user.nr FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+</table>
+
+<p>Total fixes: [% total FILTER html %]</p>
+
+[% PROCESS global/footer.html.tmpl %]

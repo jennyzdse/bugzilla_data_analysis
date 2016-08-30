@@ -1,0 +1,174 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # fixers: list of hashes. May be empty. Each hash has two members:
+  #   login_name: string. The login name of the user
+  #   nr: integer. The number of bugs fixed by the users
+  # submitters: list of hashes. May be empty. Each hash has two members:
+  #   login_name: string. The login name of the user
+  #   nr: integer. The number of bugs fixed by the users
+  # years: list of hashes. May be empty. Each hash has three members:
+  #   year: string.
+  #   new_users: integer. The number of new users per year
+  #   new_bugs: integer. The number of new bugs per year
+  # fix_days: a hash. has three members:
+  #   avg: float.
+  #   max: float.
+  #   min: float.
+  #%]
+
+
+[% PROCESS global/header.html.tmpl
+           title = "Statistics"
+ %]
+
+<h3> TOP FIXERS </h3>
+[% total = 0 %]
+<table id="topfixers">
+  <tr>
+    <th>Who</th>
+    <th>Number of fixed bugs</th>
+  </tr>
+
+  [% FOREACH user = fixers %]
+    [% total = total + user.nr %]
+    <tr>
+      <td>
+          [% user.login_name FILTER email FILTER html %]
+      </td>
+      <td class="right">
+        [% user.nr FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+</table>
+<p>Total fixes: [% total FILTER html %]</p>
+
+<h3> TOP REPORTERS </h3>
+[% total = 0 %]
+<table id="topreporters">
+  <tr>
+    <th>Who</th>
+    <th>Number of reported bugs</th>
+  </tr>
+
+  [% FOREACH user = submitters %]
+    [% total = total + user.nr %]
+    <tr>
+      <td>
+          [% user.login_name FILTER email FILTER html %]
+      </td>
+      <td class="right">
+        [% user.nr FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+</table>
+<p>Total reported: [% total FILTER html %]</p>
+
+<h3> BUGZILLA USAGE </h3>
+<table id="anual">
+  <tr>
+    <th>year</th>
+    <th>new users</th>
+    <th>new bugs</th>
+  </tr>
+
+  [% FOREACH year = years %]
+    <tr>
+      <td>
+        [% year.year FILTER html %]
+      </td>
+      <td class=right>
+        [% year.new_users FILTER html %]
+      </td>
+      <td class=right>
+        [% year.new_bugs FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+</table>
+
+<h3> BUGS RESOLUTION TIMES </h3>
+<table id="performance">
+  <tr>
+    <th>AVG (days)</th>
+    <th>MAX (days)</th>
+    <th>MIN (days)</th>
+  </tr>
+  [% FOREACH fix_day = fix_days %]
+    <tr>
+      <td>
+        [% fix_day.avg FILTER html %]
+      </td>
+      <td class=right>
+        [% fix_day.max FILTER html %]
+      </td>
+      <td class=right>
+        [% fix_day.min FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+</table>
+
+<div class="column" id=StatusPie>
+<h3>Last 30 days bug status chart</h3>
+</div>
+
+<script src="extensions/Statistics/web/d3.v3.min.js" charset="utf-8"></script>
+<script>
+var width = 200,
+    height = 200,
+    radius = Math.min(width, height) / 2;
+
+var color = d3.scale.category10();
+
+var arc = d3.svg.arc()
+    .outerRadius(radius - 10)
+    .innerRadius(0);
+
+var labelArc = d3.svg.arc()
+    .outerRadius(radius - 40)
+    .innerRadius(radius - 40);
+
+var pie = d3.layout.pie()
+    .sort(null)
+    .value(function(d) { return d.count; });
+
+var svg = d3.select("#StatusPie").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+  .append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+var data = [
+  [% FOREACH row = last30days %]
+{"count": [% row.count FILTER html %], "bug_status": "[% row.bug_status FILTER html %]" },
+  [% END %]
+]
+
+var g = svg.selectAll(".arc")
+   .data(pie(data))
+   .enter().append("g")
+   .attr("class", "arc");
+
+g.append("path")
+   .attr("d", arc)
+   .style("fill", function(d) { return color(d.data.bug_status); })
+   .append("svg:title")
+      .text(function(d) { return "Status: "+d.data.bug_status+" Count: "+d.data.count; });
+
+g.append("text")
+   .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+   .attr("dy", ".35em")
+   .text(function(d) { return d.data.bug_status; });
+</script>
+
+[% PROCESS global/footer.html.tmpl %]
+

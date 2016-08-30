@@ -1,0 +1,43 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # users: list of hashes. May be empty. Each hash has two members:
+  #   login_name: string. The login name of the user
+  #   nr: integer. The number of bugs fixed by the users
+  #%]
+
+
+[% PROCESS global/header.html.tmpl
+           title = "Anual Statistics"
+ %]
+
+[% total = 0 %]
+<table id="anual">
+  <tr>
+    <th>year</th>
+    <th>new users</th>
+    <th>new bugs</th>
+  </tr>
+
+  [% FOREACH year = years %]
+    <tr>
+      <td>
+        [% year.year FILTER html %]
+      </td>
+      <td class=right>
+        [% year.new_users FILTER html %]
+      </td>
+      <td class=right>
+        [% year.new_bugs FILTER html %]
+      </td>
+    </tr>
+  [% END %]
+</table>
+
+[% PROCESS global/footer.html.tmpl %]
