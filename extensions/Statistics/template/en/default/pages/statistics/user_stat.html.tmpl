@@ -1,0 +1,54 @@
+[%# This Source Code Form is subject to the terms of the Mozilla Public
+  # License, v. 2.0. If a copy of the MPL was not distributed with this
+  # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  #
+  # This Source Code Form is "Incompatible With Secondary Licenses", as
+  # defined by the Mozilla Public License, v. 2.0.
+  #%]
+
+[%# INTERFACE:
+  # fix_days: a hash. has three members:
+  #   avg: float.
+  #   max: float.
+  #   min: float.
+  #%]
+
+
+[% PROCESS global/header.html.tmpl
+           title = "User"
+ %]
+
+<form action="page.cgi">
+  <input type="text" name="query" value="">
+  <input type="hidden" name="id" value="statistics/search_res.html">
+  <input type="submit" value="Submit">
+</form> 
+
+
+<h2>[% user.login_name FILTER html %]  </h2>
+          
+
+<table id="topfixers">
+    <tr> <td> Fixed    </td> <td class="right"> [% fixed.nr FILTER html %] </td> </tr>
+    <tr> <td> Reported </td> <td class="right"> [% submitted.nr FILTER html %] </td> </tr>
+    <tr> <td> MinFix   </td> <td class="right"> [% fix_days.min FILTER html %] </td> </tr>
+    <tr> <td> AvgFix   </td> <td class="right"> [% fix_days.avg FILTER html %] </td> </tr>
+    <tr> <td> MaxFix   </td> <td class="right"> [% fix_days.max FILTER html %] </td> </tr>
+</table>
+
+<h3> Active in Products </h3>
+<table id="products">
+  <tr>
+    <th>Name</th>
+    <th>Number of bugs handled or submitted by [% user.login_name FILTER email FILTER html %]</th>
+  </tr>
+
+  [% FOREACH product = products %]
+    <tr>
+      <td> <a href="page.cgi?id=statistics/stat.html&product_id=[% product.product_id %]">[% product.name FILTER html %]</a> </td>
+      <td class="right"> [% product.nr FILTER html %] </td>
+    </tr>
+  [% END %]
+</table>
+
+[% PROCESS global/footer.html.tmpl %]

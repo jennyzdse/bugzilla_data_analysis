@@ -1,0 +1,39 @@
+[% PROCESS global/header.html.tmpl
+	   title = "Search Res"
+ %]
+
+<form action="page.cgi">
+  <input type="text" name="query" value="">
+  <input type="hidden" name="id" value="statistics/search_res.html">
+  <input type="submit" value="Submit">
+</form> 
+
+<h2> Search Results  </h2>
+          
+<h3> Products </h3>
+<table id="products">
+  <tr>
+    <th>Name</th>
+  </tr>
+
+  [% FOREACH product = products %]
+    <tr>
+      <td> <a href="page.cgi?id=statistics/stat.html&product_id=[% product.product_id %]">[% product.name FILTER html %]</a> </td>
+    </tr>
+  [% END %]
+</table>
+
+<h3> People </h3>
+<table id="users">
+  <tr>
+    <th>Name</th>
+  </tr>
+
+  [% FOREACH user = users %]
+    <tr>
+      <td> <a href="page.cgi?id=statistics/user_stat.html&user_id=[% user.id %]">[% user.name FILTER html %]</a> </td>
+    </tr>
+  [% END %]
+</table>
+
+[% PROCESS global/footer.html.tmpl %]
