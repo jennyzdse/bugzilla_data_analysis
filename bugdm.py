@@ -8,6 +8,9 @@ import os, sys
 import datetime
 import MySQLdb as mysql
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 class bugDM():
     '''
     a simple bugzilla data analysis tool
@@ -226,6 +229,8 @@ def main(argv):
 
     #try:
     if 1:
+        fig = plt.figure(figsize=(12,10))
+
         fo = open(fn, 'r')
         bugdm = bugDM(fo)
         print "Totally %d users, %d projects and %d bugs" % bugdm.get_summary()
@@ -235,28 +240,65 @@ def main(argv):
         print "             Top %d bug hunters           | num of submitted bugs" % num
         print "================================================================="
         top_hunters = bugdm.get_bug_hunter()
+        people = []
+        number = []
         for item in top_hunters:
+            people.append(item[0][:-13])
+            number.append(item[1])
             print "%40s | %d" %(item[0], item[1])
         print "=================================================================\n\n"
 
+        # draw the graph
+        y_pos = np.arange(num)
+        plt.subplot(311)
+        plt.barh(y_pos, number, align='center', left=0.4, alpha=0.4)
+        plt.yticks(y_pos, people)
+        plt.xlabel('Number of TR')
+        plt.ylabel('Reporter')
+        plt.title('Top %d bug hunters' % num)
+
         print "             Top %d bug killers           | num of resolved bugs" % num
         print "================================================================="
+        people = []
+        number = []
         top_hunters = bugdm.get_bug_killer()
         for item in top_hunters:
+            people.append(item[0][:-13])
+            number.append(item[1])
             print "%40s | %d" %(item[0], item[1])
         print "=================================================================\n\n"
+
+        plt.subplot(312)
+        plt.barh(y_pos, number, align='center', left=0.4, alpha=0.4)
+        plt.yticks(y_pos, people)
+        plt.xlabel('Number of TR')
+        plt.ylabel('Resolver')
+        plt.title('Top %d bug hunters' % num)
 
         fix_time_mean, fix_time_long, bugs_status_list = bugdm.get_bugs_status()
 
         print "=================================================================\n\n"
+        year = []
+        number = []
         user_status_list, new_users = bugdm.get_user_status()
         print "             new users           |  year"
         print "================================================================="
         for item in new_users:
+            year.append(item[1])
+            number.append(item[0])
             print "%30d  | %d" %(item[0], item[1])
         print "=================================================================\n\n"
 
+        y_pos = np.arange(len(year))
+        plt.subplot(313)
+        plt.barh(y_pos, number, align='center', left=0.4, alpha=0.4)
+        plt.yticks(y_pos, year)
+        plt.xlabel('Number of new users')
+        plt.ylabel('Year')
+        plt.title('New users')
 
+        plt.show()
+        plt.savefig('Bugzilla_analysis_chart')
         bugdm.db_disconn()
         fo.close()
     #except Exception as e:
